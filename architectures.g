@@ -1,3 +1,6 @@
+#Imports:
+LoadPackage("grape");
+
 ##############################
 # function GenerateMesh
 # Input:
@@ -45,6 +48,75 @@ GenerateMesh := function(n)
     return rot;
 end;
 
+MeshCheckRelation := function(n)
+    local f;
+    f := function(i,j)
+        local xi,yi,xj,yj;
+        xi := ((i - 1) mod n) + 1;
+        xj := ((j - 1) mod n) + 1;
+        yi := (i - xi)/n;
+        yj := (j - xj)/n;
+        
+        if (AbsInt(xi - xj) = 1) and (yi = yj) then
+            return true;
+        fi;
+        if (AbsInt(yi - yj) = 1) and (xi = xj) then
+            return true;
+        fi;
+        return false;
+    end;
+    return f;
+end;
+
+
+GenerateMeshGraph := function(n)
+    local f,L,G;
+    G := Group([()]);
+    L := [1..n*n];
+    f := MeshCheckRelation(n);
+    return Graph(G,L,OnPoints,f);
+end;
+
+InvertNames := function(names)
+    local res,i;
+    res := [1..Length(names)];
+    for i in [1..Length(names)] do
+        res[names[i]] := i;
+    od;
+    return res;
+end;
+
+
+HAECPlane := function()
+    local G, periodic, temp, res, invnames, i,j, edges, n;
+    periodic=true;
+    n := 4;
+    temp := GenerateMeshGraph(n);
+    edges := [];
+    G := AutGroupGraph(temp);
+    for i in [1..Length(temp.representatives)] do
+        for j in [1..Length(temp.adjacencies[i])] do
+            Append(edges, [[temp.representatives[i],temp.adjacencies[i][j]]]);
+        od;
+    od;
+    
+    #perodic boundary conditions
+    if periodic = true then
+        for i in [1..n] do
+            Append(edges, [[i,n*(n-1)+i]]);
+            Append(edges, [[n*(i-1)+1,n*(i-1)+n]]);
+        od;
+    fi;
+
+    res:= EdgeOrbitsGraph(G,edges,n*n);
+    return res;
+end;
+
+HAECBox := function()
+
+    
+                   
+    
 # Test: GenerateMesh(4):
 #
 #  1  2  3  4

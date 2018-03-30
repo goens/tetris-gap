@@ -143,6 +143,34 @@ NaiveTetris := function(G,x,m)
     return;
 end;
 
+###############################
+# function BruteForceTetris
+# Input:
+#   G Group G acting on M
+#   X ocupied subset of M
+#   m point in M
+#
+# Output:
+#   gm with overlap(gm,X) = 0
+#   or empty if none found
+#
+#------------------------------
+# Brute-force version: calculates
+# the elements one by one and
+# checks if they are in the orbit
+# if they have no overlap
+###############################
+BruteForceTetris := function(G,x,m)
+    local S,orb, overlaps, elem;
+    S := SymmetricGroup( LargestMovedPoint(G));
+    orb := Orbit(G,m,OnTuples);
+    for elem in orb do
+        if Overlap(x,elem) = 0 then
+            return elem;
+        fi;
+    od;
+    return;
+end;
         
     
 #example:
@@ -155,6 +183,8 @@ Print(Runtimes());
 resHeuristic := PlayTetris(G,x,m,rec());
 Print(Runtimes());
 resNaive := NaiveTetris(G,x,m);
+Print(Runtimes());
+resBrute := BruteForceTetris(G,x,m);
 Print(Runtimes());
 
 #example 2:
