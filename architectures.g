@@ -1,3 +1,5 @@
+# Copyright: 2018 Andres Goens
+
 #Imports:
 LoadPackage("grape");
 
@@ -89,7 +91,7 @@ end;
 
 HAECPlane := function()
     local G, periodic, temp, res, invnames, i,j, edges, n;
-    periodic=true;
+    periodic := true;
     n := 4;
     temp := GenerateMeshGraph(n);
     edges := [];
@@ -113,6 +115,25 @@ HAECPlane := function()
 end;
 
 HAECBox := function()
+    local G, temp, res, invnames, i,j,k, edges, l, n;
+    
+    l := 4;
+    temp := HAECPlane();
+    edges := [];
+    G := AutGroupGraph(temp);
+    n := LargestMovedPoint(G);
+    
+    for i in [1..Length(temp.representatives)] do
+        for j in [1..Length(temp.adjacencies[i])] do
+            for k in [0..(l-1)] do
+                Append(edges, [[temp.representatives[i]+k*n,temp.adjacencies[i][j]+k*n]]);
+            od;
+        od;
+    od;
+    
+    res:= EdgeOrbitsGraph(G,edges,l*n);
+    return res;
+end;
 
     
                    
